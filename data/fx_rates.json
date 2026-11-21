@@ -1,0 +1,12 @@
+{
+  "base_currency": "USD",
+  "fx_rate_date": "2026-11-21",
+  "fx_source": "bundled_synthetic_fx_table",
+  "rates_to_usd": {
+    "USD": "1.0000",
+    "GBP": "1.2800",
+    "EUR": "1.0900",
+    "MXN": "0.0580",
+    "INR": "0.0120"
+  }
+}

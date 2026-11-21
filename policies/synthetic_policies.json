@@ -1,0 +1,43 @@
+{
+  "policy_version": "GLOBAL-2026.01",
+  "effective_from": "2026-01-01",
+  "base_currency": "USD",
+  "rules": [
+    {
+      "rule_id": "MEAL-001",
+      "category": "MEALS",
+      "region": "GLOBAL",
+      "description": "Individual business meal limit in USD equivalent",
+      "limit_usd": "75.00",
+      "severity": "WARNING",
+      "disposition_on_breach": "NEEDS_REVIEW"
+    },
+    {
+      "rule_id": "ALC-001",
+      "category": "MEALS",
+      "region": "GLOBAL",
+      "description": "Alcoholic beverages require controller review",
+      "alcohol_prohibited": true,
+      "severity": "HIGH",
+      "disposition_on_breach": "NEEDS_REVIEW"
+    },
+    {
+      "rule_id": "SPL-001",
+      "category": "ALL",
+      "region": "GLOBAL",
+      "description": "Potential split transactions combining above threshold within 2 hours",
+      "combined_threshold_usd": "75.00",
+      "severity": "HIGH",
+      "disposition_on_breach": "NEEDS_REVIEW"
+    },
+    {
+      "rule_id": "HIGH-001",
+      "category": "ALL",
+      "region": "GLOBAL",
+      "description": "Single expense exceeding $500.00 USD requires controller verification",
+      "max_single_usd": "500.00",
+      "severity": "WARNING",
+      "disposition_on_breach": "NEEDS_REVIEW"
+    }
+  ]
+}
