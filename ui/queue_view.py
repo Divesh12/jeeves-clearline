@@ -93,6 +93,10 @@ def _disposition_badge(disp: Disposition) -> str:
     return f'<span class="cl-badge cl-badge-warn">● {esc}</span>'
 
 
+def _select_expense(expense_id: str) -> None:
+    st.session_state["selected_expense_id"] = expense_id
+
+
 def render_kpi_strip(records: list[DecisionRecord]) -> None:
     total = len(records)
     cleared = sum(1 for r in records if _is_clear(r.disposition))
@@ -121,7 +125,7 @@ def render_kpi_strip(records: list[DecisionRecord]) -> None:
 def render_expense_queue(
     records: list[DecisionRecord],
     selected_id: str | None,
-) -> str | None:
+) -> None:
     st.markdown("### Queue")
     st.caption("Prioritized items needing controller attention")
 
@@ -202,9 +206,8 @@ def render_expense_queue(
 
     if not filtered:
         st.info("No matching expenses for the current filter and search criteria.")
-        return None
+        return
 
-    chosen_id: str | None = None
     for r in filtered:
         is_selected = r.expense_id == selected_id
         merchant_raw = _extract_merchant(r.extraction, r.file_name)
@@ -244,12 +247,11 @@ def render_expense_queue(
                 st.markdown("<div style='height:4px;'></div>", unsafe_allow_html=True)
                 btn_label = "Selected" if is_selected else "Inspect"
                 btn_type = "primary" if is_selected else "secondary"
-                if st.button(
+                st.button(
                     btn_label,
                     key=f"inspect_btn_{r.expense_id}",
                     type=btn_type,
                     use_container_width=True,
-                ):
-                    chosen_id = r.expense_id
-
-    return chosen_id
+                    on_click=_select_expense,
+                    args=(r.expense_id,),
+                )

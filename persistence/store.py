@@ -1,18 +1,14 @@
 from __future__ import annotations
-from config import DB_FILE, LEDGER_FILE
 
 import csv
-import json
 import sqlite3
 from pathlib import Path
 from typing import Optional
 
-from config import config
+from config import DB_FILE, LEDGER_FILE
 from models.domain import (
-    ApprovalStatus,
     ControllerOverride,
     DecisionRecord,
-    Disposition,
 )
 
 
@@ -170,7 +166,11 @@ class AuditStore:
             ).fetchall()
             return [DecisionRecord.model_validate_json(r["record_json"]) for r in rows]
 
-    def find_exact_hash_matches(self, file_sha256: str, exclude_expense_id: Optional[str] = None) -> list[DecisionRecord]:
+    def find_exact_hash_matches(
+        self,
+        file_sha256: str,
+        exclude_expense_id: Optional[str] = None,
+    ) -> list[DecisionRecord]:
         with self._connect() as conn:
             if exclude_expense_id:
                 rows = conn.execute(
@@ -258,6 +258,8 @@ class AuditStore:
                     "UPDATE decisions SET record_json = ? WHERE expense_id = ?",
                     (rec.model_dump_json(), override.expense_id),
                 )
+
+    apply_override = record_override
 
     def list_overrides(self, expense_id: str) -> list[dict]:
         with self._connect() as conn:

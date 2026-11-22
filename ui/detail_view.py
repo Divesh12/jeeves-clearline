@@ -185,7 +185,7 @@ def _render_pdf_preview(pdf_bytes: bytes, file_name: str, expense_id: str) -> No
                 st.image(
                     pil_img,
                     caption=f"{file_name} (Page 1 of {len(pdf)})",
-                    use_container_width=True,
+                    width="stretch",
                 )
                 rendered_page = True
         except Exception:
@@ -206,7 +206,7 @@ def _render_pdf_preview(pdf_bytes: bytes, file_name: str, expense_id: str) -> No
         file_name=file_name,
         mime="application/pdf",
         key=f"download_pdf_{expense_id}",
-        use_container_width=True,
+        width="stretch",
     )
 
 
@@ -283,7 +283,7 @@ def render_expense_detail(
             if raw_bytes and is_pdf:
                 _render_pdf_preview(raw_bytes, resolved_name or record.file_name, record.expense_id)
             elif raw_bytes:
-                st.image(raw_bytes, caption=resolved_name, use_container_width=True)
+                st.image(raw_bytes, caption=resolved_name, width="stretch")
             else:
                 st.info("Receipt preview unavailable for this seeded record.")
 
@@ -511,7 +511,7 @@ def render_expense_detail(
                         new_approval_status=ApprovalStatus(new_app_val),
                         reason=reason_txt.strip(),
                     )
-                    store.apply_override(override)
+                    store.record_override(override)
                     st.toast("Decision saved to Audit Log.")
                     st.rerun()
 

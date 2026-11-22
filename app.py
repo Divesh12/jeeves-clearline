@@ -156,6 +156,8 @@ def main() -> None:
         )
 
     records = store.list_decisions()
+    if st.session_state.selected_expense_id is None and records:
+        st.session_state.selected_expense_id = records[0].expense_id
 
     head_l, head_r = st.columns([5.5, 1.5])
     with head_l:
@@ -282,17 +284,11 @@ def main() -> None:
         q_col, d_col = st.columns([0.95, 1.55], gap="large")
 
         with q_col:
-            chosen = render_expense_queue(records, st.session_state.selected_expense_id)
-            if chosen and chosen != st.session_state.selected_expense_id:
-                st.session_state.selected_expense_id = chosen
+            render_expense_queue(records, st.session_state.selected_expense_id)
 
         with d_col:
-            current_records = store.list_decisions()
-            target_id = (
-                st.session_state.selected_expense_id
-                or (current_records[0].expense_id if current_records else None)
-            )
-            selected_rec = next((r for r in current_records if r.expense_id == target_id), None)
+            target_id = st.session_state.selected_expense_id
+            selected_rec = next((r for r in records if r.expense_id == target_id), None)
             if selected_rec:
                 render_expense_detail(selected_rec, store, st.session_state.uploaded_bytes_cache)
             else:
