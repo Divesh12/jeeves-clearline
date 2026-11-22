@@ -1,4 +1,5 @@
 from __future__ import annotations
+from config import DB_FILE, LEDGER_FILE
 
 import csv
 import json
@@ -16,7 +17,7 @@ from models.domain import (
 
 
 class AuditStore:
-    def __init__(self, db_path: Path = config.DB_FILE) -> None:
+    def __init__(self, db_path: Path = DB_FILE) -> None:
         self.db_path = db_path
         self._init_db()
 
@@ -88,9 +89,10 @@ class AuditStore:
         cleaned = "".join(ch.lower() if ch.isalnum() or ch.isspace() else " " for ch in name)
         return " ".join(cleaned.split())
 
-    def seed_baseline_from_csv(self, csv_path: Path = config.LEDGER_FILE) -> int:
+    def seed_baseline_from_csv(self, csv_path: Path = LEDGER_FILE) -> int:
         if not csv_path.exists():
             return 0
+        self._init_db()
         inserted = 0
         with self._connect() as conn, csv_path.open("r", encoding="utf-8") as f:
             reader = csv.DictReader(f)

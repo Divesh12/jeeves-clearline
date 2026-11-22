@@ -1,4 +1,5 @@
 from __future__ import annotations
+from config import LEDGER_FILE, SAMPLES_DIR
 
 import csv
 import random
@@ -10,7 +11,7 @@ from PIL import Image, ImageDraw
 from config import config
 
 
-def generate_synthetic_ledger(output_path: Path = config.LEDGER_FILE, rows: int = 200) -> None:
+def generate_synthetic_ledger(output_path: Path = LEDGER_FILE, rows: int = 200) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     rng = random.Random(42)
     roles = ["Account Executive", "Engineer", "Product Manager", "Operations"]
@@ -66,7 +67,7 @@ def _save_pdf(path: Path, lines: list[str]) -> None:
     print(f"Created {path}")
 
 
-def generate_sample_receipts(out_dir: Path = config.SAMPLES_DIR) -> None:
+def generate_sample_receipts(out_dir: Path = SAMPLES_DIR) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     _save_png(out_dir / "01_clean_us_lunch.png", [

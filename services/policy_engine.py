@@ -6,7 +6,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Optional
 
-from config import config
+from config import POLICY_FILE, config
 from models.domain import Disposition, ExtractedReceipt, Finding, MoneyConversion, Severity
 
 
@@ -17,7 +17,7 @@ class PolicyOutcome:
     findings: list[Finding]
 
 
-def load_policy(policy_path: Path = config.POLICY_FILE) -> dict:
+def load_policy(policy_path: Path = POLICY_FILE) -> dict:
     with policy_path.open("r", encoding="utf-8") as f:
         return json.load(f)
 

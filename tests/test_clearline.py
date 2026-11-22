@@ -3,6 +3,8 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 import pytest
+import io
+from PIL import Image
 
 from models.domain import (
     ApprovalStatus,
@@ -27,7 +29,7 @@ class StubExtractor(ReceiptExtractor):
 @pytest.fixture()
 def temp_store(tmp_path: Path) -> AuditStore:
     ledger_csv = tmp_path / "ledger.csv"
-    generate_synthetic_ledger(output_path=ledger_csv, rows=60)
+    generate_synthetic_ledger(output_path=ledger_csv, rows=250)
     store = AuditStore(db_path=tmp_path / "test_clearline.db")
     store.seed_baseline_from_csv(ledger_csv)
     return store
@@ -56,7 +58,7 @@ def test_clean_us_lunch_clears(temp_store: AuditStore) -> None:
     rec = run_expense_pipeline(
         store=temp_store,
         file_name="lunch.png",
-        file_bytes=b"\x89PNG\r\n\x1a\nfake_png_1",
+        file_bytes = _make_png_bytes((70, 80, 90)),
         employee_id="E104",
         extractor_override=StubExtractor(receipt),
     )
@@ -87,7 +89,7 @@ def test_arithmetic_mismatch_routes_to_review(temp_store: AuditStore) -> None:
     rec = run_expense_pipeline(
         store=temp_store,
         file_name="bad_math.png",
-        file_bytes=b"\x89PNG\r\n\x1a\nfake_png_2",
+        file_bytes=_make_png_bytes((40, 50, 60)),
         employee_id="E107",
         extractor_override=StubExtractor(receipt),
     )
@@ -113,7 +115,7 @@ def test_exact_duplicate_is_blocked(temp_store: AuditStore) -> None:
         extraction_complete=True,
         extraction_source="test",
     )
-    payload = b"\x89PNG\r\n\x1a\nduplicate_bytes"
+    payload = _make_png_bytes((70, 80, 90))
     first = run_expense_pipeline(
         store=temp_store,
         file_name="dup.png",
@@ -137,7 +139,7 @@ def test_failed_extraction_never_auto_clears(temp_store: AuditStore) -> None:
     rec = run_expense_pipeline(
         store=temp_store,
         file_name="blurry.png",
-        file_bytes=b"\x89PNG\r\n\x1a\nblurry_bytes",
+        file_bytes=_make_png_bytes((100, 110, 120)),
         employee_id="E105",
         extractor_override=ManualReviewExtractor("Unreadable receipt"),
     )
@@ -180,3 +182,9 @@ def test_override_requires_reason_and_persists(temp_store: AuditStore) -> None:
     assert updated.disposition == Disposition.CLEAR
     assert updated.approval_status == ApprovalStatus.APPROVED
     assert len(temp_store.list_overrides(rec.expense_id)) == 1
+
+def _make_png_bytes(color: tuple[int, int, int]) -> bytes:
+    img = Image.new("RGB", (32, 32), color=color)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()

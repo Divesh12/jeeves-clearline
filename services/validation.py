@@ -6,7 +6,7 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 from typing import Optional
 
-from config import config
+from config import FX_RATES_FILE, config
 from models.domain import Disposition, ExtractedReceipt, Finding, MoneyConversion, Severity
 
 
@@ -19,7 +19,7 @@ class ValidationOutcome:
     findings: list[Finding]
 
 
-def load_fx_table(fx_path: Path = config.FX_RATES_FILE) -> dict:
+def load_fx_table(fx_path: Path = FX_RATES_FILE) -> dict:
     with fx_path.open("r", encoding="utf-8") as f:
         return json.load(f)
 
